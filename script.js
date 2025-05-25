@@ -37,3 +37,23 @@ navigator.geolocation.getCurrentPosition(async (position) => {
 }, () => {
   document.getElementById("status").textContent = "位置情報の取得に失敗しました。";
 });
+// 1. 位置情報を取得
+navigator.geolocation.getCurrentPosition(async (position) => {
+  const lat = position.coords.latitude;
+  const lon = position.coords.longitude;
+
+  // 2. 逆ジオコーディングして住所取得
+  const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+  const data = await response.json();
+
+  // 3. 表示（例：div#locationに表示）
+  const locationElement = document.getElementById('location');
+  if (data.address) {
+    const { state, city, town, village } = data.address;
+    const address = `${state || ''} ${city || town || village || ''}`;
+    locationElement.textContent = `📍 あなたの現在地：${address}`;
+  } else {
+    locationElement.textContent = '📍 現在地を特定できませんでした';
+  }
+});
+
